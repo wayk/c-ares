@@ -33,6 +33,8 @@ OPTION (CARES_SHARED     "Build as a shared library"                            
 OPTION (CARES_INSTALL    "Create installation targets (chain builders may want to disable this)" ON)
 OPTION (CARES_STATIC_PIC "Build the static library as PIC (position independent)"                OFF)
 OPTION (CARES_BUILD_TESTS "Build and run tests"                                                  OFF)
+OPTION (CARES_BUILD_APPS  "Build command-line applications"                                      OFF)
+OPTION (CARES_WITH_LIBNSL "Use libnsl if it is available"                                         ON)
 
 # allow linking against the static runtime library in msvc
 IF (MSVC)
@@ -121,7 +123,10 @@ IF (IOS AND HAVE_LIBRESOLV)
 	SET (CARES_USE_LIBRESOLV 1)
 ENDIF()
 
+IF (CARES_WITH_LIBNSL)
 CHECK_LIBRARY_EXISTS (nsl gethostbyname "" HAVE_LIBNSL)
+ENDIF (CARES_WITH_LIBNSL)
+
 CHECK_LIBRARY_EXISTS (socket gethostbyname "" HAVE_GHBN_LIBSOCKET)
 CHECK_LIBRARY_EXISTS (socket socket "" HAVE_SOCKET_LIBSOCKET)
 IF (HAVE_GHBN_LIBSOCKET OR HAVE_SOCKET_LIBSOCKET)
@@ -669,6 +674,7 @@ ENDIF ()
 SET (CARES_FOUND 1 CACHE INTERNAL "CARES LIBRARY FOUND")
 SET (CARES_LIBRARIES ${PROJECT_NAME}::cares CACHE INTERNAL "CARES LIBRARIES")
 
+IF (CARES_BUILD_APPS)
 
 # Build ahost
 ADD_EXECUTABLE (ahost ahost.c ${SAMPLESOURCES})
@@ -695,3 +701,5 @@ TARGET_LINK_LIBRARIES (acountry PRIVATE ${PROJECT_NAME})
 IF (CARES_INSTALL)
 	INSTALL (TARGETS acountry ${TARGETS_INST_DEST})
 ENDIF ()
+
+ENDIF (CARES_BUILD_APPS)
